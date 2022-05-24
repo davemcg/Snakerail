@@ -1,0 +1,138 @@
+# notes
+# to run, first you need to setup the config['recount_ref'] dir 
+# and get the references using the monorail scripts
+# e.g.
+# bash ~/git/monorail-external/get_unify_refs.sh
+# bash ~/git/monorail-external/get_human_ref_indexes.sh
+# and the sif images in the same ref folder
+# singularity pull docker://quay.io/broadsword/recount-unify:1.1.0
+# singularity pull docker://quay.io/benlangmead/recount-rs5:1.0.6
+
+fq_files = []
+study_fq_tsv = config['study_fq']
+for line in open(study_fq_tsv):
+	if 'sample_id' in line:
+		continue
+	line = line.split('\t')
+	fq_files.append(line[1].strip())
+
+fq_dir = config['fq_dir']
+
+
+rule all:
+	input:
+		expand('rse/{organism}/homes_index', organism = config['organism'])
+
+rule pump:
+	input:
+		fq_dir + '/{fq}' + config['fq1_suffix'],
+		fq_dir + '/{fq}' + config['fq2_suffix']
+	output:
+		'pump/{fq}/output/{fq}_att0/stats.json'
+	params:
+		pump_sh = config['run_recount_pump'],
+		sif = config['pump_sif'],
+		genome = config['genome'],
+		cores = config['cores'],
+		recount_reference_dir = config['recount_ref'],
+		project_name = config['project']
+	threads:
+		config['cores']
+	shell:
+		"""
+		module load singularity
+		mkdir -p pump/{wildcards.fq}
+		cd pump/{wildcards.fq}
+
+		export NO_SHARED_MEM=1 && /bin/bash {params.pump_sh} \
+			{params.sif} \
+			{wildcards.fq} \
+			local \
+			{params.genome} \
+			{params.cores} \
+			{params.recount_reference_dir} \
+			{input} \
+			{params.project_name}
+		"""
+
+localrules: rm_temp
+rule rm_temp:
+	input:
+		'pump/{fq}/output/{fq}_att0/stats.json'
+	output:
+		'pump/{fq}/rm_temp'
+	shell:
+		"""
+		rm -r pump/{wildcards.fq}/temp*
+		touch {output}
+		"""
+
+localrules: rsync_pump
+rule rsync_pump:
+	input:
+		'pump/{fq}/rm_temp'
+	output:
+		directory('pump_output/{fq}_att0')
+	shell:
+		"""
+		mkdir -p pump_output
+	 	rsync -rav pump/{wildcards.fq}/output/ pump_output
+		"""
+
+rule unify:
+	input:
+		expand(directory('pump_output/{fq}_att0'), fq = fq_files)
+	output:
+		'unify_output/junctions.sqlite'
+	params:
+		unify_sh = config['run_recount_unify'],
+		sif = config['unify_sif'],
+		genome = config['genome'],
+		cores = config['cores'],
+		recount_reference_dir = config['recount_ref'],
+		project_name = config['project'],
+		working_dir = config['working_dir']
+	shell:
+		"""
+		module load singularity
+		mkdir -p unify_output
+		cd unify_output
+		/bin/bash {params.unify_sh} \
+        	{params.sif} \
+        	{params.genome} \
+       		{params.recount_reference_dir} \
+        	{params.working_dir}/unify_output \
+        	{params.working_dir}/pump_output \
+        	{params.working_dir}/{study_fq_tsv} \
+        	{params.cores} \
+        	{params.project_name}:111
+		"""
+
+localrules: make_rse
+rule make_rse:
+	input:
+		'unify_output/junctions.sqlite'
+	output:
+		'rse/{organism}/homes_index'
+	params:
+		project_name = config['project'],
+		recount_reference_dir = config['recount_ref']
+	shell:
+		"""
+		mkdir -p rse/{wildcards.organism}
+		cd rse/{wildcards.organism}
+		mkdir -p annotations/exon_sums
+		mkdir -p annotations/gene_sums
+		rsync -av {params.recount_reference_dir}/*exon_sum*gtf.gz annotations/exon_sums
+		rsync -av {params.recount_reference_dir}/*gene_sum*gtf.gz annotations/gene_sums
+		mkdir -p data_sources/{params.project_name}/base_sums
+		rsync -rav ../../unify_output/exon_sums_per_study/ data_sources/{params.project_name}/exon_sums/
+		rsync -rav ../../unify_output/gene_sums_per_study/ data_sources/{params.project_name}/gene_sums/
+		rsync -rav ../../unify_output/junction_counts_per_study/ data_sources/{params.project_name}/junctions
+		rsync -rav ../../unify_output/metadata data_sources/{params.project_name}/
+
+		zcat data_sources/{params.project_name}/metadata/*/*/*recount_project.* | head -n 1 | gzip > data_sources/{params.project_name}/metadata/{params.project_name}.recount_project.MD.gz
+		zcat data_sources/{params.project_name}/metadata/*/*/*recount_project.* | grep -v rail_id | gzip >> data_sources/{params.project_name}/metadata/{params.project_name}.recount_project.MD.gz
+
+		echo data_sources/{params.project_name} > homes_index
+		"""
