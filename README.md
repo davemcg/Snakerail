@@ -14,3 +14,8 @@ How to use:
   - `singularity pull docker://quay.io/benlangmead/recount-rs5:1.0.6`
 4. Copy and edit the [yaml](https://github.com/davemcg/Snakerail/blob/main/snakerail_config.yaml) to your working dir
 5. Run (**SPECIFIC TO NIH HPC**) `bash /path/to/repo/Snakerail/Snakerail/Snakerail.wrapper.sh snakerail_config.yaml`
+
+
+# Uh, doesn't monorail use Snakemake?
+
+Yes, but the `pump` and `unify` steps are (at least for me) a bit fiddly to keep track of the individual steps. So this wraps the whole thing in one Snakefile. Essentially you start with a metadata tsv (first col is study and second col is fastq prefix) and your fastq files. It runs `pump`, then moves them all into a folder for `unify` and after `unify` finishes, it munges the unify output into a [RSE](https://www.rdocumentation.org/packages/SummarizedExperiment/versions/1.2.3/topics/RangedSummarizedExperiment-class) for use in [recount3](https://bioconductor.org/packages/release/bioc/html/recount3.html)
