@@ -38,8 +38,6 @@ def return_fq_set(fq_prefix, fq_dir, fq1_suffix, fq2_suffix):
 	else:
 		out.append(fq_dir + '/' + fq_prefix + fq1_suffix)
 		out.append(fq_dir + '/' + fq_prefix + fq2_suffix)
-	print(out)
-	print(type(out))
 	return(out)
 
 
