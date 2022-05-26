@@ -9,7 +9,6 @@
 # singularity pull docker://quay.io/benlangmead/recount-rs5:1.0.6
 
 
-
 fq_files = []
 fq_setup_dict = {}
 study_fq_tsv = config['study_fq']
@@ -43,10 +42,14 @@ def return_fq_set(fq_prefix, fq_dir, fq1_suffix, fq2_suffix):
 
 fq_dir = config['fq_dir']
 
-
-rule all:
-	input:
-		expand('rse/{organism}/homes_index', organism = config['organism'])
+if config['end_at_pump'] == 'True':
+	rule all:
+		input:
+			expand('pump_output/{fq}_att0', fq = fq_files)
+else:
+	rule all:
+		input:
+			expand('rse/{organism}/homes_index', organism = config['organism'])
 
 
 rule pump:
