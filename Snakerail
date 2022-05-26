@@ -8,13 +8,40 @@
 # singularity pull docker://quay.io/broadsword/recount-unify:1.1.0
 # singularity pull docker://quay.io/benlangmead/recount-rs5:1.0.6
 
+
+
 fq_files = []
+fq_setup_dict = {}
 study_fq_tsv = config['study_fq']
+# format of study_fq_tsv
+# tab separated
+# setup is either "paired" or "single"
+# header of: study_id	sample_id	setup
+# example line:
+# zander	D3C_D0_1__HJLT7DSX3_19270591_S73_L002	paired
 for line in open(study_fq_tsv):
+	if len(line.split()) != 3:
+		import sys
+		sys.exit(print('\n****************\nONLY ' + str(len(line.split())) + \
+					' tab separated values in config[\'study_fq\']!!!!\n***************\n'))
 	if 'sample_id' in line:
 		continue
 	line = line.split('\t')
-	fq_files.append(line[1].strip())
+	fq_files.append(line[1])
+	fq_setup_dict[line[1]] = line[2].strip()
+
+def return_fq_set(fq_prefix, fq_dir, fq1_suffix, fq2_suffix):
+	fq_file_setup = fq_setup_dict[fq_prefix]
+	out = []
+	if fq_file_setup == 'single':
+		out.append(fq_dir + '/' + fq_prefix + fq1_suffix)
+	else:
+		out.append(fq_dir + '/' + fq_prefix + fq1_suffix)
+		out.append(fq_dir + '/' + fq_prefix + fq2_suffix)
+	print(out)
+	print(type(out))
+	return(out)
+
 
 fq_dir = config['fq_dir']
 
@@ -23,10 +50,10 @@ rule all:
 	input:
 		expand('rse/{organism}/homes_index', organism = config['organism'])
 
+
 rule pump:
 	input:
-		fq_dir + '/{fq}' + config['fq1_suffix'],
-		fq_dir + '/{fq}' + config['fq2_suffix']
+		fq = lambda wildcards: return_fq_set(wildcards.fq, fq_dir, config['fq1_suffix'], config['fq2_suffix'])
 	output:
 		'pump/{fq}/output/{fq}_att0/stats.json'
 	params:
@@ -81,7 +108,7 @@ rule rsync_pump:
 
 rule unify:
 	input:
-		expand(directory('pump_output/{fq}_att0'), fq = fq_files)
+		expand('pump_output/{fq}_att0', fq = fq_files)
 	output:
 		'unify_output/junctions.sqlite'
 	params:
