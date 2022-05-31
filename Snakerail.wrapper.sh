@@ -10,9 +10,9 @@ sbcmd="sbatch --cpus-per-task={threads} \
 --error={cluster.error} \
 {cluster.extra}"
 
-snakemake -s /home/mcgaugheyd/git/monorail-external/Snakerail \
+snakemake -s /home/mcgaugheyd/git/Snakerail/Snakerail \
   -pr --local-cores 2 --jobs 500 \
-  --cluster-config /home/mcgaugheyd/git/monorail-external/cluster.json \
+  --cluster-config /home/mcgaugheyd/git/Snakerail/cluster.json \
   --cluster "$sbcmd"  --latency-wait 120 --rerun-incomplete \
   --configfile $1 \
   -k --restart-times 0 \

@@ -7,5 +7,12 @@
 		"extra" : " --gres=lscratch:10",
 		"output"  : "00log/{rule}_{wildcards}.out",
 		"error" : "00log/{rule}_{wildcards}.err" 
+	},
+	"unify" :
+	{
+		"partition" : "quick",
+		"time" : "02:00:00",
+		"mem" : "8g",
+		"extra" : " --gres=lscratch:5"
 	}
 }

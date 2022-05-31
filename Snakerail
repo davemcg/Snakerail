@@ -39,7 +39,15 @@ def return_fq_set(fq_prefix, fq_dir, fq1_suffix, fq2_suffix):
 		out.append(fq_dir + '/' + fq_prefix + fq2_suffix)
 	return(out)
 
-
+def return_pump_script(fq_prefix, pump_sh_path):
+	fq_file_setup = fq_setup_dict[fq_prefix]
+	out = []
+	if fq_file_setup != 'single':
+		out = pump_sh_path
+	else:
+		out = pump_sh_path.replace('.sh', '_single.sh')
+	return(out)
+	
 fq_dir = config['fq_dir']
 
 if config['end_at_pump'] == 'True':
@@ -58,7 +66,7 @@ rule pump:
 	output:
 		'pump/{fq}/output/{fq}_att0/stats.json'
 	params:
-		pump_sh = config['run_recount_pump'],
+		pump_sh = lambda wildcards: return_pump_script(wildcards.fq, config['run_recount_pump']),
 		sif = config['pump_sif'],
 		genome = config['genome'],
 		cores = config['cores'],
