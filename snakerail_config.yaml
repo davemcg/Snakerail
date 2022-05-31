@@ -12,3 +12,4 @@ cores:  6
 study_fq: 'study_fq.tsv'
 working_dir: '/data/mcgaugheyd/projects/nei/bharti/zander_bharti_iRPE_differentiation/'
 organism: 'human'
+end_at_pump: 'False'
