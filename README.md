@@ -24,4 +24,4 @@ Yes, but the `pump` and `unify` steps are (at least for me) a bit fiddly to keep
 
 # Why doesn't David just remove all the `module` lines?
 
-Because this is for my working use on NIH HPC, which uses a module system which I abuse instead of rolling my own containers or conda envs or something. 
+Because this is for my working use on NIH HPC, which uses a module system which I abuse instead of rolling my own containers or conda envs or something. If you do want to run this and are having trouble, let me know. I don't think it's much more effort to make more general. Again, I'm lazy and don't want to optimize further if only I am using it. 
