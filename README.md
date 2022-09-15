@@ -4,8 +4,9 @@ Snakemake wrapper for [monorail](https://github.com/langmead-lab/monorail-extern
 
 How to use:
 
-1. Remove all `module load singularity` lines unless your HPC also uses a module system
-2. `git clone` [monorail](https://github.com/langmead-lab/monorail-external)
+1. Remove all `module load singularity` lines from [Snakerail]( https://github.com/davemcg/Snakerail/blob/main/Snakerail)unless your HPC also uses a module system
+2. `git clone https://github.com/davemcg/Snakerail.git`
+2. `git clone https://github.com/langmead-lab/monorail-external`
 3. Install reference info and images using monorail scripts:
   - `cd /path/to/ref/folder`
   - `bash ~/path/monorail-external/get_unify_refs.sh`
