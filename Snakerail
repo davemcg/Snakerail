@@ -19,7 +19,7 @@ study_fq_tsv = config['study_fq']
 # example line:
 # zander	D3C_D0_1__HJLT7DSX3_19270591_S73_L002	paired
 for line in open(study_fq_tsv):
-	if len(line.split()) != 3:
+	if len(line.split('\t')) != 3:
 		import sys
 		sys.exit(print('\n****************\nONLY ' + str(len(line.split())) + \
 					' tab separated values in config[\'study_fq\']!!!!\n***************\n'))
@@ -33,7 +33,7 @@ def return_fq_set(fq_prefix, fq_dir, fq1_suffix, fq2_suffix):
 	fq_file_setup = fq_setup_dict[fq_prefix]
 	out = []
 	if fq_file_setup == 'single':
-		out.append(fq_dir + '/' + fq_prefix + fq1_suffix)
+		out.append(fq_dir + '/' + fq_prefix + config['fqS_suffix'])
 	else:
 		out.append(fq_dir + '/' + fq_prefix + fq1_suffix)
 		out.append(fq_dir + '/' + fq_prefix + fq2_suffix)

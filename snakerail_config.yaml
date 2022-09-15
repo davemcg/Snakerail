@@ -8,6 +8,7 @@ pump_sif:  '/data/mcgaugheyd/genomes/hg38_monorail/recount-rs5_1.0.6.sif'
 unify_sif: '/data/mcgaugheyd/genomes/hg38_monorail/recount-unify_1.1.0.sif'
 fq1_suffix:  '_R1_001.fastq.gz'
 fq2_suffix:  '_R2_001.fastq.gz'
+fqS_suffix: '.fastq.gz'
 cores:  6
 study_fq: 'study_fq.tsv'
 working_dir: '/data/mcgaugheyd/projects/nei/bharti/zander_bharti_iRPE_differentiation/'
