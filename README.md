@@ -13,8 +13,9 @@ How to use:
   - `singularity pull docker://quay.io/broadsword/recount-unify:1.1.0`
   - `singularity pull docker://quay.io/benlangmead/recount-rs5:1.0.6`
 4. Copy and edit the [yaml](https://github.com/davemcg/Snakerail/blob/main/snakerail_config.yaml) to your working dir
-5. Run (**SPECIFIC TO NIH HPC**) `bash /path/to/repo/Snakerail/Snakerail/Snakerail.wrapper.sh snakerail_config.yaml`
-  - a bit more genericly, you could run something like `snakemake -s /path/to/this/repo/Snakerail --configfile snakerail_config.yaml`
+5. Create file metadata file in tsv format (used in [yaml](https://github.com/davemcg/Snakerail/blob/main/snakerail_config.yaml) as `study_fq`). Example [here](https://github.com/davemcg/Snakerail/blob/main/study_fq.tsv)
+6. Run (**SPECIFIC TO NIH HPC**) `bash /path/to/repo/Snakerail/Snakerail/Snakerail.wrapper.sh snakerail_config.yaml`
+  - a bit more generically, you could run something like `snakemake -s /path/to/this/repo/Snakerail --configfile snakerail_config.yaml`
 
 
 # Uh, doesn't monorail use Snakemake?
