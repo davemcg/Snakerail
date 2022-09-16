@@ -13,9 +13,10 @@ How to use:
   - `bash ~/path/monorail-external/get_human_ref_indexes.sh`
   - `singularity pull docker://quay.io/broadsword/recount-unify:1.1.0`
   - `singularity pull docker://quay.io/benlangmead/recount-rs5:1.0.6`
-4. Copy and edit the [yaml](https://github.com/davemcg/Snakerail/blob/main/snakerail_config.yaml) to your working dir
-5. Create file metadata file in tsv format (used in [yaml](https://github.com/davemcg/Snakerail/blob/main/snakerail_config.yaml) as `study_fq`). Example [here](https://github.com/davemcg/Snakerail/blob/main/study_fq.tsv)
-6. Run (**SPECIFIC TO NIH HPC**) `bash /path/to/repo/Snakerail/Snakerail/Snakerail.wrapper.sh snakerail_config.yaml`
+4. ONLY IF YOU HAVE SINGLE END FILES: copy the `run_recount_pump_single.sh` in `src` of this repo to the `singularity` folder in wherever you cloned the monorail repo. For example: `cp ~/path/to/Snakerail/src/run_recount_pump_single.sh ~/path/monorail-external/singularity/`
+5. Copy and edit the [yaml](https://github.com/davemcg/Snakerail/blob/main/snakerail_config.yaml) to your working dir
+6. Create file metadata file in tsv format (used in [yaml](https://github.com/davemcg/Snakerail/blob/main/snakerail_config.yaml) as `study_fq`). Example [here](https://github.com/davemcg/Snakerail/blob/main/study_fq.tsv)
+7. Run (**SPECIFIC TO NIH HPC**) `bash /path/to/repo/Snakerail/Snakerail/Snakerail.wrapper.sh snakerail_config.yaml`
   - a bit more generically, you could run something like `snakemake -s /path/to/this/repo/Snakerail --configfile snakerail_config.yaml`
 
 
@@ -26,3 +27,7 @@ Yes, but the `pump` and `unify` steps are (at least for me) a bit fiddly to keep
 # Why doesn't David just remove all the `module` lines?
 
 Because this is for my working use on NIH HPC, which uses a module system which I abuse instead of rolling my own containers or conda envs or something. If you do want to run this and are having trouble, let me know. I don't think it's much more effort to make more general. Again, I'm lazy and don't want to optimize further if only I am using it. 
+
+# What is with that file in `src`?????
+
+Monorail has a bug (?) where the script they provide to run it assumes, for a local run, that it is paired end. This script just tweaks it lightly to take out the second fq file and move up the study name by one
