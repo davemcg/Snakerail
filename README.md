@@ -22,7 +22,7 @@ How to use:
 
 # Uh, doesn't monorail use Snakemake?
 
-Yes, but the `pump` and `unify` steps are (at least for me) a bit fiddly to keep track of the individual steps. So this wraps the whole thing in one Snakefile. Essentially you start with a metadata tsv (first col is study and second col is fastq prefix) and your fastq files. It runs `pump`, then moves them all into a folder for `unify` and after `unify` finishes, it munges the unify output into a [RSE](https://www.rdocumentation.org/packages/SummarizedExperiment/versions/1.2.3/topics/RangedSummarizedExperiment-class) for use in [recount3](https://bioconductor.org/packages/release/bioc/html/recount3.html)
+Yes, but the `pump` and `unify` steps are (at least for me) a bit fiddly to keep track of the individual steps. So this wraps the whole thing in one Snakefile. Essentially you start with a metadata tsv (first col is study, second col is fastq prefix, and third col is `single` or `paired` to denote how the sequencing was done) and your fastq files in a folder. It runs `pump`, then moves them all into a folder for `unify`. After `unify` finishes, it munges the unify output into a [RSE](https://www.rdocumentation.org/packages/SummarizedExperiment/versions/1.2.3/topics/RangedSummarizedExperiment-class) for direct use in [recount3](https://bioconductor.org/packages/release/bioc/html/recount3.html)
 
 # Why doesn't David just remove all the `module` lines?
 
