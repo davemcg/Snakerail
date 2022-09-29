@@ -11,6 +11,7 @@
 
 fq_files = []
 fq_setup_dict = {}
+study_sample_dict = {}
 study_fq_tsv = config['study_fq']
 # format of study_fq_tsv
 # tab separated
@@ -28,6 +29,7 @@ for line in open(study_fq_tsv):
 	line = line.split('\t')
 	fq_files.append(line[1])
 	fq_setup_dict[line[1]] = line[2].strip()
+	study_sample_dict[line[1]] = line[0]
 
 def return_fq_set(fq_prefix, fq_dir, fq1_suffix, fq2_suffix):
 	fq_file_setup = fq_setup_dict[fq_prefix]
@@ -71,7 +73,7 @@ rule pump:
 		genome = config['genome'],
 		cores = config['cores'],
 		recount_reference_dir = config['recount_ref'],
-		project_name = config['project']
+		study_name = lambda wildcards: study_sample_dict[wildcards.fq]
 	threads:
 		config['cores']
 	shell:
@@ -88,7 +90,7 @@ rule pump:
 			{params.cores} \
 			{params.recount_reference_dir} \
 			{input} \
-			{params.project_name}
+			{params.study_name}
 		"""
 
 localrules: rm_temp
