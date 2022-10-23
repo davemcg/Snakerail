@@ -11,7 +11,7 @@ sbcmd="sbatch --cpus-per-task={threads} \
 {cluster.extra}"
 
 snakemake -s /home/mcgaugheyd/git/Snakerail/Snakerail \
-  -pr --local-cores 2 --jobs 500 \
+  -pr --local-cores 2 --jobs 100 \
   --cluster-config /home/mcgaugheyd/git/Snakerail/cluster.json \
   --cluster "$sbcmd"  --latency-wait 120 --rerun-incomplete \
   --configfile $1 \
