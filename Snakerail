@@ -27,6 +27,8 @@ for line in open(study_fq_tsv):
 	if 'sample_id' in line:
 		continue
 	line = line.split('\t')
+	if line[1] in fq_files:
+		sys.exit(print("Duplicated run: " + line[1] + "\nCheck study_fq file for duplicates"))
 	fq_files.append(line[1])
 	fq_setup_dict[line[1]] = line[2].strip()
 	study_sample_dict[line[1]] = line[0]
@@ -60,7 +62,6 @@ else:
 	rule all:
 		input:
 			expand('rse/{organism}/homes_index', organism = config['organism'])
-
 
 rule pump:
 	input:
@@ -146,12 +147,12 @@ rule unify:
         	{params.project_name}:111
 		"""
 
-localrules: make_rse
-rule make_rse:
+localrules: move_rse
+rule move_rse:
 	input:
 		'unify_output/junctions.sqlite'
 	output:
-		'rse/{organism}/homes_index'
+		'DONE_{organism}'
 	params:
 		project_name = config['project'],
 		recount_reference_dir = config['recount_ref']
@@ -168,7 +169,22 @@ rule make_rse:
 		rsync -rav ../../unify_output/gene_sums_per_study/ data_sources/{params.project_name}/gene_sums/
 		rsync -rav ../../unify_output/junction_counts_per_study/ data_sources/{params.project_name}/junctions
 		rsync -rav ../../unify_output/metadata data_sources/{params.project_name}/
+		cd ../../
+		touch {output}
+		"""
 
+localrules: make_rse_meta
+rule make_rse_meta:
+	input:
+		'DONE_{organism}'
+	output:
+		'rse/{organism}/homes_index'
+	params:
+		project_name = config['project'],
+		recount_reference_dir = config['recount_ref']
+	shell:
+		"""
+		cd rse/{wildcards.organism}
 		zcat data_sources/{params.project_name}/metadata/*/*/*recount_project.* | head -n 1 | gzip > data_sources/{params.project_name}/metadata/{params.project_name}.recount_project.MD.gz
 		zcat data_sources/{params.project_name}/metadata/*/*/*recount_project.* | grep -v rail_id | gzip >> data_sources/{params.project_name}/metadata/{params.project_name}.recount_project.MD.gz
 
